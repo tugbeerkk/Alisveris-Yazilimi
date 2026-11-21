@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ürünlerim - {{ isletme.isletme_adi }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='stil.css') }}" rel="stylesheet">
+</head>
+<body>
+<header class="topbar">
+    <p class="brand">Ürünlerim<small>{{ isletme.isletme_adi }}</small></p>
+    <div class="nav-actions">
+        <a href="/barkod" class="btn btn-ghost btn-sm">Ürün ekle</a>
+        <a href="/barkodlar-indir" class="btn btn-ghost btn-sm">Tüm barkodları indir (ZIP)</a>
+        <a href="/hatirlatici" class="btn btn-ghost btn-sm">Hatırlatıcı</a>
+        <a href="/raporlar" class="btn btn-ghost btn-sm">Raporlar</a>
+        <a href="/panel" class="btn btn-ghost btn-sm">Panele dön</a>
+    </div>
+</header>
+<main class="container py-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <div class="kart">
+        <div class="table-responsive">
+            <table class="table align-middle text-center">
+                <thead><tr><th>Resim</th><th class="text-start">Ürün</th><th>Barkod no</th><th>Barkod</th><th>Fiyat</th><th>Stok</th><th>Stok ekle</th><th></th></tr></thead>
+                <tbody>
+                {% if isletme.urunler %}
+                  {% for urun in isletme.urunler %}
+                  <tr>
+                    <td>{% if urun.resim_yolu %}<img src="{{ url_for('static', filename=urun.resim_yolu) }}" alt="" class="urun-resim">{% else %}<span class="text-muted small">Yok</span>{% endif %}</td>
+                    <td class="text-start fw-bold">{{ urun.urun_adi }}</td>
+                    <td>{{ urun.barkod_no }}</td>
+                    <td>{% if urun.barkod_gorsel_yolu %}<img src="{{ url_for('static', filename=urun.barkod_gorsel_yolu) }}" alt="Barkod" style="width:90px;height:38px;object-fit:contain"><a href="/barkod-indir/{{ urun.urun_id }}" class="d-block small fw-bold mt-1" style="color:var(--brand)">İndir</a>{% else %}<span class="text-muted small">Yok</span>{% endif %}</td>
+                    <td class="fw-bold">{{ urun.fiyat }} ₺</td>
+                    <td><span class="rozet {% if urun.stok_miktari < 5 %}uyari{% endif %}">{{ urun.stok_miktari }}</span></td>
+                    <td>
+                        <form method="POST" action="/stok-ekle/{{ urun.urun_id }}" class="input-group input-group-sm" style="width:140px;margin:auto">
+                            <input type="number" name="miktar" min="1" value="1" class="form-control" required aria-label="Eklenecek adet">
+                            <button class="btn btn-brand" type="submit">Ekle</button>
+                        </form>
+                    </td>
+                    <td><a href="/urun-sil/{{ urun.urun_id }}" class="btn btn-soft-danger btn-sm" onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">Sil</a></td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr><td colspan="8" class="text-muted py-5">Henüz ürün yok. <a href="/barkod" style="color:var(--brand)">İlk ürününüzü ekleyin</a>.</td></tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

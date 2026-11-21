@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporlar - {{ isletme.isletme_adi }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='stil.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header class="topbar">
+    <p class="brand">Raporlar<small>{{ isletme.isletme_adi }}</small></p>
+    <div class="nav-actions">
+        <a href="/urun" class="btn btn-ghost btn-sm">Ürünler</a>
+        <a href="/kasa" class="btn btn-ghost btn-sm">Kasa</a>
+        <a href="/hatirlatici" class="btn btn-ghost btn-sm">Hatırlatıcı</a>
+        <a href="/barkod" class="btn btn-ghost btn-sm">Ürün Ekle</a>
+        <a href="/panel" class="btn btn-ghost btn-sm">Panele dön</a>
+    </div>
+</header>
+<main class="container py-4">
+    <div class="row g-4 mb-4">
+        <div class="col-md-6"><div class="kart kart-govde"><h2 class="h6 fw-bold mb-3">Aylık ciro ve kâr (₺)</h2><canvas id="ciroKarGrafik"></canvas></div></div>
+        <div class="col-md-6"><div class="kart kart-govde"><h2 class="h6 fw-bold mb-3">Aylık satış adedi</h2><canvas id="adetGrafik"></canvas></div></div>
+    </div>
+    <div class="kart">
+        <div class="kart-baslik">Aylık özet</div>
+        <div class="table-responsive">
+        <table class="table align-middle text-center">
+            <thead><tr><th>Ay / Yıl</th><th>Satılan adet</th><th>Ciro</th><th>Net kâr</th></tr></thead>
+            <tbody>
+            {% if aylik_veriler %}
+              {% for ay, veri in aylik_veriler.items() %}
+              <tr><td class="fw-bold">{{ ay }}</td><td><span class="rozet">{{ veri.adet }} adet</span></td>
+                  <td class="fw-bold">{{ veri.ciro }} ₺</td><td class="fw-bold" style="color:var(--brand)">{{ veri.kar }} ₺</td></tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" class="text-muted py-4">Henüz satış verisi yok.</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</main>
+<script>
+    const etiketler = {{ etiketler | tojson }};
+    const ciroListesi = {{ ciro_listesi | tojson }};
+    const karListesi = {{ kar_listesi | tojson }};
+    const adetListesi = {{ adet_listesi | tojson }};
+    Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
+    new Chart(document.getElementById('ciroKarGrafik'), {type:'bar',
+        data:{labels:etiketler,datasets:[
+            {label:'Ciro (₺)',data:ciroListesi,backgroundColor:'#0f6b57',borderRadius:6},
+            {label:'Net kâr (₺)',data:karListesi,backgroundColor:'#e8a317',borderRadius:6}]},
+        options:{responsive:true}});
+    new Chart(document.getElementById('adetGrafik'), {type:'line',
+        data:{labels:etiketler,datasets:[{label:'Satılan adet',data:adetListesi,borderColor:'#0f6b57',backgroundColor:'rgba(15,107,87,.12)',borderWidth:2,fill:true,tension:.3}]},
+        options:{responsive:true}});
+</script>
+</body>
+</html>

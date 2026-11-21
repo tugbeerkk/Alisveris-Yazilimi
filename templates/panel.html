@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel - {{ isletme.isletme_adi }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='stil.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header class="topbar">
+    <p class="brand">{{ isletme.isletme_adi }}<small>Kontrol paneli</small></p>
+    <a href="/cikis" class="btn btn-ghost btn-sm">Çıkış yap</a>
+</header>
+<main class="container py-5" style="max-width:1100px">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+    <div class="row g-4">
+
+        <!-- Sol: menü -->
+        <div class="col-lg-8">
+            <h1 class="h4 fw-bold mb-4">Ne yapmak istersiniz?</h1>
+            <div class="row g-3">
+                <div class="col-md-6"><a href="/barkod" class="kart menu-kart">
+                    <div class="ikon"><i class="fas fa-barcode"></i></div>
+                    <h2>Ürün ekle</h2><p>Yeni ürün tanımlayın, barkod otomatik oluşsun.</p></a></div>
+                <div class="col-md-6"><a href="/urun" class="kart menu-kart">
+                    <div class="ikon"><i class="fas fa-boxes-stacked"></i></div>
+                    <h2>Ürünlerim</h2><p>Stok ve fiyatları görüntüleyin.</p></a></div>
+                <div class="col-md-6"><a href="/kasa" class="kart menu-kart">
+                    <div class="ikon"><i class="fas fa-cash-register"></i></div>
+                    <h2>Kasa</h2><p>Barkod okutarak hızlı satış yapın.</p></a></div>
+                <div class="col-md-6"><a href="/raporlar" class="kart menu-kart">
+                    <div class="ikon"><i class="fas fa-chart-line"></i></div>
+                    <h2>Raporlar</h2><p>Aylık ciro, kâr ve satış adedi.</p></a></div>
+                <div class="col-md-6"><a href="/hatirlatici" class="kart menu-kart">
+                    <div class="ikon"><i class="fas fa-bell"></i></div>
+                    <h2>Stok hatırlatıcı</h2><p>Stok belli sayıya inince haber alın.</p></a></div>
+            </div>
+        </div>
+
+        <!-- Sağ: bildirimler -->
+        <aside class="col-lg-4">
+            <div class="kart" style="position:sticky;top:1rem">
+                <div class="kart-baslik d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-bell me-2" style="color:var(--amber)"></i>Bildirimler</span>
+                    {% if bildirimler %}<span class="rozet uyari">{{ bildirimler|length }}</span>{% endif %}
+                </div>
+                <div style="max-height:460px;overflow-y:auto">
+                {% for b in bildirimler %}
+                    <div class="log-oge">
+                        <div>{{ b.mesaj }}</div>
+                        <a href="/bildirim-okundu/{{ b.id }}" class="small fw-bold" style="color:var(--brand)">Okundu</a>
+                    </div>
+                {% else %}
+                    <div class="text-muted text-center py-5 px-3 small">
+                        <i class="far fa-bell-slash fa-2x mb-2 d-block"></i>Yeni bildirim yok.
+                    </div>
+                {% endfor %}
+                </div>
+                {% if bildirimler|length > 1 %}
+                <div class="kart-govde border-top py-2 text-center">
+                    <a href="/bildirim-hepsi-okundu" class="small fw-bold" style="color:var(--muted)">Tümünü okundu yap</a>
+                </div>
+                {% endif %}
+            </div>
+        </aside>
+
+    </div>
+</main>
+</body>
+</html>
